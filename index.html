@@ -1,0 +1,2224 @@
+<!DOCTYPE html>
+<html lang="te" class="h-full">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport"
+    content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>అయ్యప్ప భిక్ష క్యాలెండర్ / Ayyappa Biksha Calendar</title>
+  <meta name="description"
+    content="Ayyappa Swamy Mandala Deeksha Biksha & Alpharam Schedules - భిక్ష మరియు అల్పాహార సమయాల వివరాలు">
+  <meta name="theme-color" content="#C2410C">
+
+  <!-- Open Graph Metadata for Social & WhatsApp link previews -->
+  <meta property="og:title" content="అయ్యప్ప భిక్ష క్యాలెండర్ / Ayyappa Biksha Calendar">
+  <meta property="og:description" content="Ayyappa Swamy Mandala Deeksha Biksha & Alpharam Schedules">
+  <meta property="og:type" content="website">
+
+  <!-- Sacred Om SVG Favicon -->
+  <link rel="icon"
+    href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🕉️</text></svg>">
+
+  <!-- Google Fonts: Inter & Noto Sans Telugu -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700&family=Inter:wght@400;500;600;700&family=Noto+Sans+Telugu:wght@400;500;600;700&display=swap"
+    rel="stylesheet">
+
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            sacred: {
+              ivory: '#FAF7F2',
+              cream: '#F5EFEB',
+              border: '#E8DED1',
+            },
+            terracotta: {
+              50: '#fff7ed',
+              100: '#ffedd5',
+              200: '#fed7aa',
+              300: '#fdba74',
+              400: '#fb923c',
+              500: '#f97316',
+              600: '#ea580c',
+              700: '#c2410c', /* Primary sacred terracotta */
+              800: '#9a3412',
+              900: '#7c2d12',
+            },
+            templeAmber: {
+              50: '#fffbeb',
+              100: '#fef3c7',
+              200: '#fde68a',
+              300: '#fcd34d',
+              400: '#fbbf24',
+              500: '#f59e0b',
+              600: '#d97706',
+              700: '#b45309',
+            },
+            biksha: {
+              DEFAULT: '#047857', // Deep Emerald Green (High contrast)
+              dot: '#10B981',     // Bright Emerald Dot
+              bg: '#065F46',
+              light: '#D1FAE5',
+              text: '#065F46'
+            },
+            alpharam: {
+              DEFAULT: '#4338CA', // Deep Royal Indigo (High contrast)
+              dot: '#6366F1',     // Rich Indigo Dot
+              bg: '#3730A3',
+              light: '#E0E7FF',
+              text: '#3730A3'
+            },
+            charcoal: {
+              800: '#1E293B',
+              900: '#0F172A',
+            }
+          },
+          fontFamily: {
+            sans: ['Inter', 'Noto Sans Telugu', 'system-ui', 'sans-serif'],
+            telugu: ['Noto Sans Telugu', 'sans-serif'],
+            cinzel: ['Cinzel', 'serif']
+          }
+        }
+      }
+    }
+  </script>
+
+  <!-- Lucide Icons CDN -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <!-- Firebase App & Realtime Database SDKs (Compat for vanilla JS SPAs) -->
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
+
+  <style>
+    /* Prevent horizontal scroll entirely */
+    html,
+    body {
+      overflow-x: hidden;
+      max-width: 100vw;
+      background-color: #FAF7F2;
+      color: #1E293B;
+      -webkit-tap-highlight-color: transparent;
+      font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+    }
+
+    /* Compact custom scrollbar */
+    ::-webkit-scrollbar {
+      width: 4px;
+      height: 4px;
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: #D97706;
+      border-radius: 9999px;
+    }
+
+    /* Subtle touch active states */
+    button:active,
+    a:active {
+      transform: scale(0.98);
+      transition: transform 0.08s ease;
+    }
+  </style>
+</head>
+
+<body
+  class="min-h-full flex flex-col font-sans antialiased text-charcoal-800 bg-[#FAF7F2] overflow-x-hidden selection:bg-orange-100 selection:text-orange-900">
+
+  <!-- ================= TOP EMERGENCY BROADCAST BANNER ================= -->
+  <aside id="broadcastBanner"
+    class="bg-gradient-to-r from-terracotta-700 via-terracotta-800 to-terracotta-900 text-amber-100 shadow-sm relative z-50 hidden transition-all">
+    <div class="max-w-md mx-auto px-3 py-2 flex items-center justify-between text-xs font-medium">
+      <div class="flex items-center space-x-2 flex-1 pr-2 overflow-hidden">
+        <span
+          class="inline-flex items-center px-1.5 py-0.5 rounded-full text-[10px] font-bold bg-amber-400 text-terracotta-950 uppercase tracking-wider flex-shrink-0">
+          <i data-lucide="bell" class="w-3 h-3 mr-0.5"></i>
+          <span data-i18n="badge_alert">గమనిక</span>
+        </span>
+        <p id="broadcastBannerText" class="truncate font-medium text-amber-50"></p>
+      </div>
+      <div class="flex items-center space-x-1.5 flex-shrink-0">
+        <button onclick="openAdminModal()" class="text-amber-200 hover:text-white p-1" title="Edit Announcement">
+          <i data-lucide="edit-3" class="w-3.5 h-3.5"></i>
+        </button>
+        <button onclick="dismissBanner()" class="text-amber-200 hover:text-white p-1" aria-label="Dismiss">
+          <i data-lucide="x" class="w-4 h-4"></i>
+        </button>
+      </div>
+    </div>
+  </aside>
+
+  <!-- ================= STICKY COMPACT HEADER ================= -->
+  <header class="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-sacred-border shadow-xs">
+    <div class="max-w-md mx-auto px-3 h-14 flex items-center justify-between">
+
+      <!-- App Brand -->
+      <div class="flex items-center space-x-2 cursor-pointer select-none" onclick="clearDateFilterAndCategory()">
+        <div
+          class="w-8 h-8 rounded-xl bg-gradient-to-br from-terracotta-600 via-templeAmber-600 to-terracotta-800 flex items-center justify-center text-white shadow-xs flex-shrink-0">
+          <span class="font-cinzel text-base font-bold">ॐ</span>
+        </div>
+        <div class="flex flex-col">
+          <h1 class="text-sm font-bold text-charcoal-900 leading-tight">
+            <span data-i18n="app_title">అయ్యప్ప భిక్ష క్యాలెండర్</span>
+          </h1>
+          <p class="text-[10px] font-medium text-terracotta-700 flex items-center gap-1">
+            <span class="w-1.5 h-1.5 rounded-full bg-templeAmber-500 animate-pulse"></span>
+            <span data-i18n="app_subtitle">స్వామియే శరణమయ్యప్ప • భిక్ష & అల్పాహారం</span>
+          </p>
+        </div>
+      </div>
+
+      <!-- Right Header Actions: High-Contrast Language Toggle & Guruswamy Lock -->
+      <div class="flex items-center space-x-1.5">
+
+        <!-- Live Dynamic Translation Spinner -->
+        <span id="transSpinner"
+          class="hidden text-[10px] font-bold text-terracotta-700 items-center gap-1 animate-pulse px-1">
+          <i data-lucide="loader-2" class="w-3 h-3 animate-spin text-terracotta-700"></i>
+          <span data-i18n="translating">అనువదిస్తోంది...</span>
+        </span>
+
+        <!-- Language Switch [ తెలుగు | English ] -->
+        <div class="inline-flex p-0.5 rounded-lg bg-sacred-cream border border-sacred-border text-[11px] font-bold">
+          <button id="langBtnTe" onclick="switchLanguage('te')" class="px-2.5 py-1 rounded-md transition-all">
+            తెలుగు
+          </button>
+          <button id="langBtnEn" onclick="switchLanguage('en')" class="px-2.5 py-1 rounded-md transition-all">
+            English
+          </button>
+        </div>
+
+        <!-- Guruswamy Admin Lock Button -->
+        <button onclick="openAdminModal()"
+          class="w-8 h-8 rounded-lg border border-sacred-border bg-white text-charcoal-800 hover:text-terracotta-700 flex items-center justify-center transition shadow-xs"
+          title="Guruswamy Admin">
+          <i data-lucide="lock" class="w-4 h-4 text-terracotta-700"></i>
+        </button>
+
+      </div>
+
+    </div>
+  </header>
+
+  <!-- ================= MAIN CONTAINER (MOBILE FIRST: MAX-W-MD) ================= -->
+  <main class="max-w-md mx-auto w-full px-3 py-3 space-y-3 flex-1">
+
+    <!-- ================= 1. COMPACT CALENDAR CARD ================= -->
+    <section class="bg-white rounded-2xl border border-sacred-border shadow-xs p-3 space-y-2">
+
+      <!-- Calendar Controls: Month Prev / Next / Today -->
+      <div class="flex items-center justify-between pb-1">
+        <div class="flex items-center space-x-1">
+          <button onclick="changeMonth(-1)"
+            class="w-7 h-7 rounded-lg border border-sacred-border flex items-center justify-center hover:bg-sacred-ivory transition"
+            aria-label="Previous Month">
+            <i data-lucide="chevron-left" class="w-4 h-4 text-charcoal-800"></i>
+          </button>
+          <button onclick="changeMonth(1)"
+            class="w-7 h-7 rounded-lg border border-sacred-border flex items-center justify-center hover:bg-sacred-ivory transition"
+            aria-label="Next Month">
+            <i data-lucide="chevron-right" class="w-4 h-4 text-charcoal-800"></i>
+          </button>
+          <button onclick="filterToToday()"
+            class="px-2 py-1 rounded-lg border border-sacred-border text-[10px] font-bold hover:bg-sacred-ivory transition"
+            data-i18n="btn_today">
+            ఈ రోజు
+          </button>
+        </div>
+
+        <h2 id="calendarMonthTitle" class="text-xs font-bold text-charcoal-900">
+          <!-- Dynamically populated -->
+        </h2>
+
+        <!-- Mini Legend with Redesigned High-Contrast Dots -->
+        <div class="flex items-center space-x-2 text-[10px] font-bold text-slate-600">
+          <span class="inline-flex items-center gap-1">
+            <span class="w-2 h-2 rounded-full bg-emerald-500 ring-1 ring-emerald-600/30"></span>
+            <span data-i18n="type_biksha_short">భిక్ష</span>
+          </span>
+          <span class="inline-flex items-center gap-1">
+            <span class="w-2 h-2 rounded-full bg-indigo-500 ring-1 ring-indigo-600/30"></span>
+            <span data-i18n="type_alpharam_short">అల్పాహారం</span>
+          </span>
+        </div>
+      </div>
+
+      <!-- Calendar Days Header -->
+      <div
+        class="grid grid-cols-7 text-center py-1 bg-sacred-cream/60 rounded-lg text-[10px] font-bold text-terracotta-900 uppercase"
+        id="calendarDaysHeader">
+        <!-- Sun, Mon... -->
+      </div>
+
+      <!-- Calendar Days Grid -->
+      <div id="calendarGrid" class="grid grid-cols-7 gap-1 text-center">
+        <!-- Populated dynamically via JS -->
+      </div>
+
+      <!-- Active Date Filter Pill (Shown when a specific date is tapped) -->
+      <div id="activeDateFilterBar"
+        class="hidden bg-amber-50/90 border border-amber-200 rounded-xl p-2 flex items-center justify-between text-xs">
+        <div class="flex items-center space-x-1.5 truncate">
+          <i data-lucide="calendar-check" class="w-4 h-4 text-terracotta-700 flex-shrink-0"></i>
+          <span class="font-bold text-charcoal-900 truncate" id="selectedDateLabel"></span>
+        </div>
+        <button onclick="clearSelectedDateFilter()"
+          class="px-2.5 py-1 rounded-lg bg-white border border-amber-300 text-terracotta-800 text-[10px] font-bold hover:bg-amber-100 transition flex items-center gap-1 flex-shrink-0"
+          title="Clear Date Filter">
+          <i data-lucide="x" class="w-3 h-3"></i>
+          <span id="clearDateFilterBtnText" data-i18n="btn_clear_filter">అన్నీ చూపించు (Show All)</span>
+        </button>
+      </div>
+
+    </section>
+
+    <!-- ================= 2. CATEGORY FILTER TABS ================= -->
+    <section class="flex items-center gap-1.5 overflow-x-auto scrollbar-none text-xs font-semibold py-0.5">
+      <button onclick="filterCategory('all')" id="catBtn_all"
+        class="cat-pill active flex-1 py-1.5 px-2 rounded-xl bg-terracotta-700 text-white shadow-xs flex items-center justify-center gap-1 text-[11px] whitespace-nowrap">
+        <span data-i18n="filter_all">అన్నీ (All)</span>
+        <span id="badgeCount_all" class="text-[10px] px-1.5 py-0.2 rounded-full bg-black/20 font-bold">0</span>
+      </button>
+
+      <button onclick="filterCategory('biksha')" id="catBtn_biksha"
+        class="cat-pill flex-1 py-1.5 px-2 rounded-xl bg-white hover:bg-emerald-50 text-charcoal-800 border border-sacred-border shadow-xs flex items-center justify-center gap-1 text-[11px] whitespace-nowrap">
+        <span>☀️</span>
+        <span data-i18n="filter_biksha">భిక్ష (మధ్యాహ్నం)</span>
+        <span id="badgeCount_biksha"
+          class="text-[10px] px-1.5 py-0.2 rounded-full bg-emerald-100 text-emerald-800 font-bold">0</span>
+      </button>
+
+      <button onclick="filterCategory('alpharam')" id="catBtn_alpharam"
+        class="cat-pill flex-1 py-1.5 px-2 rounded-xl bg-white hover:bg-indigo-50 text-charcoal-800 border border-sacred-border shadow-xs flex items-center justify-center gap-1 text-[11px] whitespace-nowrap">
+        <span>🌙</span>
+        <span data-i18n="filter_alpharam">అల్పాహారం (రాత్రి)</span>
+        <span id="badgeCount_alpharam"
+          class="text-[10px] px-1.5 py-0.2 rounded-full bg-indigo-100 text-indigo-800 font-bold">0</span>
+      </button>
+    </section>
+
+    <!-- ================= 3. SCHEDULE LIST / CARDS CONTAINER ================= -->
+    <section class="space-y-2.5">
+
+      <div class="flex items-center justify-between px-1">
+        <h3 class="text-xs font-bold text-slate-500 uppercase tracking-wider flex items-center gap-1">
+          <i data-lucide="calendar" class="w-3.5 h-3.5 text-terracotta-700"></i>
+          <span data-i18n="heading_schedules">నిశ్చయించిన సమయాలు (Schedules)</span>
+        </h3>
+        <span id="schedulesCountText" class="text-xs font-bold text-terracotta-800"></span>
+      </div>
+
+      <!-- Schedule Cards List -->
+      <div id="schedulesList" class="space-y-2.5">
+        <!-- Rendered dynamically -->
+      </div>
+
+      <!-- Empty State -->
+      <div id="schedulesEmptyState"
+        class="hidden text-center py-10 px-4 bg-white rounded-2xl border border-dashed border-sacred-border">
+        <div class="w-12 h-12 rounded-full bg-amber-50 text-amber-600 flex items-center justify-center mx-auto mb-2">
+          <i data-lucide="calendar-x" class="w-6 h-6"></i>
+        </div>
+        <h4 id="emptyTitle" class="text-sm font-bold text-charcoal-900 mb-1" data-i18n="empty_title">ఎటువంటి వివరాలు
+          లేవు</h4>
+        <p id="emptyDesc" class="text-xs text-slate-500 max-w-xs mx-auto mb-3" data-i18n="empty_desc">ప్రస్తుతం ఎలాంటి
+          భిక్ష లేదా అల్పాహార సమయాలు లేవు. గురుస్వామి కొత్త షెడ్యూల్‌ను జోడించవచ్చు.</p>
+        <button onclick="clearSelectedDateFilter()"
+          class="px-3 py-1.5 rounded-xl bg-terracotta-700 hover:bg-terracotta-800 text-white text-xs font-bold inline-flex items-center gap-1.5 shadow-xs">
+          <i data-lucide="rotate-ccw" class="w-3.5 h-3.5"></i>
+          <span data-i18n="btn_view_all">అన్ని షెడ్యూల్స్ చూడండి</span>
+        </button>
+      </div>
+
+    </section>
+
+  </main>
+
+  <!-- ================= GURUSWAMY ADMIN MODAL ================= -->
+  <div id="adminModal"
+    class="fixed inset-0 z-50 bg-charcoal-900/60 backdrop-blur-xs hidden items-center justify-center p-3 overflow-y-auto">
+    <div
+      class="bg-white rounded-2xl max-w-sm w-full p-4 shadow-xl border border-sacred-border relative my-auto animate-in fade-in zoom-in-95 duration-150">
+
+      <!-- Modal Top Header: Clean Flexbox, No Absolute Overlap -->
+      <div class="flex items-center justify-between pb-3 border-b border-sacred-border">
+        <div class="flex items-center space-x-2">
+          <div id="adminHeaderIconBg"
+            class="w-8 h-8 rounded-xl bg-amber-100 text-terracotta-800 flex items-center justify-center font-bold flex-shrink-0">
+            <i id="adminHeaderIcon" data-lucide="shield-check" class="w-4 h-4 text-terracotta-700"></i>
+          </div>
+          <div>
+            <h3 id="adminHeaderTitle" class="text-sm font-bold text-charcoal-900 leading-tight" data-i18n="admin_login_title">
+              గురుస్వామి అడ్మిన్ డెస్క్
+            </h3>
+            <p id="adminHeaderSub" class="text-[10px] text-slate-500 font-medium" data-i18n="admin_login_subtitle">
+              షెడ్యూల్స్ నిర్వహించడానికి సెక్యూరిటీ పిన్ నమోదు చేయండి
+            </p>
+          </div>
+        </div>
+        <!-- Right-aligned Close (X) button with minimum 44x44px touch area -->
+        <button type="button" onclick="closeAdminModal()" aria-label="Close Modal"
+          class="w-11 h-11 min-w-[44px] min-h-[44px] rounded-xl text-slate-400 hover:text-slate-700 hover:bg-slate-100 flex items-center justify-center transition border border-transparent hover:border-sacred-border flex-shrink-0">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <!-- 1. PIN AUTHENTICATION STATE -->
+      <div id="adminAuthSection" class="text-center space-y-3 pt-3 pb-1">
+        <form onsubmit="handleAdminLogin(event)" class="space-y-3">
+          <div>
+            <input type="password" id="adminPinInput" maxlength="6" inputmode="numeric" placeholder="PIN: 108"
+              class="w-full text-center tracking-widest text-base font-bold py-2.5 px-3 rounded-xl border border-sacred-border focus:ring-2 focus:ring-terracotta-700 focus:outline-none bg-sacred-ivory">
+            <p class="text-[10px] text-slate-400 mt-1.5" data-i18n="admin_default_pin_hint">డిఫాల్ట్ పిన్: 108 (Default PIN: 108)</p>
+          </div>
+          <button type="submit"
+            class="w-full min-h-[44px] py-2.5 px-4 rounded-xl bg-terracotta-700 hover:bg-terracotta-800 text-white font-bold text-xs shadow-xs transition flex items-center justify-center gap-1.5">
+            <i data-lucide="key" class="w-4 h-4"></i>
+            <span data-i18n="btn_login_admin">లాగిన్ చేయండి</span>
+          </button>
+        </form>
+      </div>
+
+      <!-- 2. ADMIN DASHBOARD & FORM (AFTER LOGIN) -->
+      <div id="adminDashboardSection" class="hidden space-y-3.5 pt-3 text-xs">
+
+        <!-- Add / Edit Schedule Form -->
+        <form onsubmit="saveScheduleForm(event)" class="space-y-2.5">
+          <input type="hidden" id="formScheduleId">
+
+          <div>
+            <label class="block font-bold text-charcoal-800 mb-1" data-i18n="label_type">కార్యక్రమ విభాగం (Type) *</label>
+            <div class="grid grid-cols-2 gap-2">
+              <label
+                class="flex items-center justify-center gap-1.5 p-2 rounded-xl border border-sacred-border cursor-pointer has-[:checked]:bg-emerald-50 has-[:checked]:border-emerald-600 has-[:checked]:text-emerald-900 font-bold text-xs">
+                <input type="radio" name="formType" value="biksha" checked onchange="handleTypeChange(event)"
+                  class="accent-emerald-700">
+                <span data-i18n="type_biksha_opt">☀️ భిక్ష (Biksha)</span>
+              </label>
+              <label
+                class="flex items-center justify-center gap-1.5 p-2 rounded-xl border border-sacred-border cursor-pointer has-[:checked]:bg-indigo-50 has-[:checked]:border-indigo-600 has-[:checked]:text-indigo-900 font-bold text-xs">
+                <input type="radio" name="formType" value="alpharam" onchange="handleTypeChange(event)"
+                  class="accent-indigo-600">
+                <span data-i18n="type_alpharam_opt">🌙 అల్పాహారం (Tiffin)</span>
+              </label>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-2 gap-2">
+            <div>
+              <label class="block font-bold text-charcoal-800 mb-0.5" data-i18n="label_date">తేదీ (Date) *</label>
+              <input type="date" id="formDate" required
+                class="w-full p-2 rounded-xl bg-sacred-ivory border border-sacred-border focus:ring-1 focus:ring-terracotta-700 text-xs font-semibold">
+            </div>
+            <div>
+              <label class="block font-bold text-charcoal-800 mb-0.5" data-i18n="label_time">సమయం (Time) *</label>
+              <input type="hidden" id="formTime" value="12:30 PM">
+              <div class="grid grid-cols-3 gap-1">
+                <select id="formTimeHour" onchange="syncCustomTimeInputs()"
+                  class="w-full py-2 px-0.5 text-center rounded-xl bg-sacred-ivory border border-sacred-border focus:ring-1 focus:ring-terracotta-700 text-xs font-bold text-charcoal-900 cursor-pointer">
+                  <option value="01">01</option>
+                  <option value="02">02</option>
+                  <option value="03">03</option>
+                  <option value="04">04</option>
+                  <option value="05">05</option>
+                  <option value="06">06</option>
+                  <option value="07">07</option>
+                  <option value="08">08</option>
+                  <option value="09">09</option>
+                  <option value="10">10</option>
+                  <option value="11">11</option>
+                  <option value="12" selected>12</option>
+                </select>
+                <select id="formTimeMinute" onchange="syncCustomTimeInputs()"
+                  class="w-full py-2 px-0.5 text-center rounded-xl bg-sacred-ivory border border-sacred-border focus:ring-1 focus:ring-terracotta-700 text-xs font-bold text-charcoal-900 cursor-pointer">
+                  <option value="00">00</option>
+                  <option value="05">05</option>
+                  <option value="10">10</option>
+                  <option value="15">15</option>
+                  <option value="20">20</option>
+                  <option value="25">25</option>
+                  <option value="30" selected>30</option>
+                  <option value="35">35</option>
+                  <option value="40">40</option>
+                  <option value="45">45</option>
+                  <option value="50">50</option>
+                  <option value="55">55</option>
+                </select>
+                <select id="formTimePeriod" onchange="syncCustomTimeInputs()"
+                  class="w-full py-2 px-0.5 text-center rounded-xl bg-amber-100/80 border border-amber-300 focus:ring-1 focus:ring-terracotta-700 text-xs font-bold text-terracotta-900 cursor-pointer">
+                  <option value="AM">AM</option>
+                  <option value="PM" selected>PM</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-2 gap-2">
+            <div>
+              <label class="block font-bold text-charcoal-800 mb-0.5" data-i18n="label_host">స్వామి / భక్తుని పేరు (Host) *</label>
+              <input type="text" id="formHost" required placeholder="శ్రీ రమణ స్వామి"
+                data-i18n-placeholder="placeholder_host"
+                class="w-full p-2 rounded-xl bg-sacred-ivory border border-sacred-border focus:ring-1 focus:ring-terracotta-700 text-xs font-medium">
+            </div>
+            <div>
+              <label class="block font-bold text-charcoal-800 mb-0.5" data-i18n="label_phone">ఫోన్ నంబర్ (Phone) *</label>
+              <input type="tel" id="formPhone" required placeholder="9848022338"
+                class="w-full p-2 rounded-xl bg-sacred-ivory border border-sacred-border focus:ring-1 focus:ring-terracotta-700 text-xs font-medium">
+            </div>
+          </div>
+
+          <div>
+            <label class="block font-bold text-charcoal-800 mb-0.5" data-i18n="label_address">వేదిక / చిరునామా (Address - ఐచ్ఛికం)</label>
+            <input type="text" id="formAddress" placeholder="డోర్ నెం, వీధి, ల్యాండ్‌మార్క్ (ఐచ్ఛికం)"
+              data-i18n-placeholder="placeholder_address"
+              class="w-full p-2 rounded-xl bg-sacred-ivory border border-sacred-border focus:ring-1 focus:ring-terracotta-700 text-xs font-medium">
+          </div>
+
+          <div>
+            <label class="block font-bold text-charcoal-800 mb-0.5" data-i18n="label_maps_url">గూగుల్ మ్యాప్స్ లింక్ (Google Maps URL - ఐచ్ఛికం)</label>
+            <input type="url" id="formMapsUrl" placeholder="https://maps.app.goo.gl/... (Optional)"
+              class="w-full p-2 rounded-xl bg-sacred-ivory border border-sacred-border focus:ring-1 focus:ring-terracotta-700 text-xs font-medium">
+          </div>
+
+          <!-- Separated Action Footer: Distinct containers for Logout and Cancel/Save with gap-3 & px-4 py-2.5 -->
+          <div class="flex items-center justify-between pt-2 border-t border-sacred-border gap-3">
+            <div>
+              <button type="button" onclick="handleAdminLogout()"
+                class="px-4 py-2.5 min-h-[44px] rounded-xl border border-rose-200 bg-rose-50 hover:bg-rose-100 text-rose-700 font-bold text-xs flex items-center justify-center gap-1.5 transition shadow-2xs">
+                <i data-lucide="log-out" class="w-3.5 h-3.5"></i>
+                <span data-i18n="btn_logout">లాగౌట్</span>
+              </button>
+            </div>
+            <div class="flex items-center gap-3">
+              <button type="button" onclick="resetScheduleForm()"
+                class="px-4 py-2.5 min-h-[44px] rounded-xl border border-sacred-border bg-slate-50 hover:bg-slate-100 font-bold text-slate-600 text-xs transition flex items-center justify-center"
+                data-i18n="btn_cancel">
+                రద్దు
+              </button>
+              <button type="submit"
+                class="px-4 py-2.5 min-h-[44px] rounded-xl bg-terracotta-700 hover:bg-terracotta-800 text-white font-bold text-xs transition flex items-center justify-center gap-1.5 shadow-xs">
+                <i data-lucide="check" class="w-3.5 h-3.5"></i>
+                <span id="formSubmitBtnText" data-i18n="btn_save_schedule">భద్రపరచండి</span>
+              </button>
+            </div>
+          </div>
+        </form>
+
+        <!-- Broadcast Banner Editor -->
+        <div class="pt-2 border-t border-sacred-border space-y-1.5">
+          <div class="flex items-center justify-between">
+            <span class="font-bold text-charcoal-900 flex items-center gap-1">
+              <i data-lucide="bell" class="w-3.5 h-3.5 text-terracotta-700"></i>
+              <span data-i18n="admin_banner_title">ముఖ్య గమనిక బ్యానర్ (Ticker)</span>
+            </span>
+            <label class="relative inline-flex items-center cursor-pointer">
+              <input type="checkbox" id="adminBannerToggle" onchange="toggleBannerStatus(this.checked)"
+                class="sr-only peer">
+              <div
+                class="w-8 h-4 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-3 after:w-3 after:transition-all peer-checked:bg-terracotta-700">
+              </div>
+            </label>
+          </div>
+          <div class="flex gap-1.5">
+            <input type="text" id="adminBannerInput" placeholder="ముఖ్య ప్రకటన..."
+              data-i18n-placeholder="placeholder_banner"
+              class="flex-1 p-2 rounded-xl bg-sacred-ivory border border-sacred-border focus:ring-1 focus:ring-terracotta-700 text-xs">
+            <button onclick="saveBannerText()"
+              class="px-3.5 py-2 min-h-[38px] rounded-xl bg-slate-800 hover:bg-black text-white font-bold text-xs transition flex-shrink-0">
+              Save
+            </button>
+          </div>
+        </div>
+
+        <!-- Security: Change PIN -->
+        <div class="pt-2 border-t border-sacred-border flex items-center justify-between">
+          <span class="text-[11px] text-slate-500 font-medium" data-i18n="admin_pin_change_hint">సెక్యూరిటీ పిన్ మార్పు:</span>
+          <button onclick="promptChangePIN()" class="text-terracotta-700 font-bold hover:underline text-[11px] min-h-[36px] flex items-center"
+            data-i18n="btn_change_pin">పిన్ మార్చండి</button>
+        </div>
+
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ================= FLOATING TOAST ================= -->
+  <div id="toast"
+    class="fixed bottom-4 left-1/2 -translate-x-1/2 z-50 transform translate-y-20 opacity-0 transition-all duration-200 pointer-events-none max-w-xs w-full px-4">
+    <div
+      class="bg-charcoal-900 text-white px-3.5 py-2 rounded-xl shadow-lg flex items-center space-x-2 text-xs font-medium border border-sacred-border/20 justify-center">
+      <span id="toastIcon">✨</span>
+      <span id="toastMsg">స్వామి శరణం</span>
+    </div>
+  </div>
+
+  <!-- ================= JAVASCRIPT APPLICATION LOGIC ================= -->
+  <script>
+    /**
+     * BILINGUAL DICTIONARY (Telugu & English)
+     * Cultural, exact, and spiritually authentic for Biksha and Alpharam
+     */
+    const i18n = {
+      te: {
+        app_title: "అయ్యప్ప భిక్ష క్యాలెండర్",
+        app_subtitle: "స్వామియే శరణమయ్యప్ప • భిక్ష & అల్పాహారం",
+        badge_alert: "గమనిక",
+        btn_today: "ఈ రోజు",
+        type_biksha_short: "భిక్ష",
+        type_alpharam_short: "అల్పాహారం",
+        type_biksha: "భిక్ష (మధ్యాహ్న భోజనం)",
+        type_alpharam: "అల్పాహారం (రాత్రి టిఫిన్)",
+        type_biksha_opt: "☀️ భిక్ష (Biksha)",
+        type_alpharam_opt: "🌙 అల్పాహారం (Tiffin)",
+        filter_all: "అన్నీ (All)",
+        filter_biksha: "భిక్ష (మధ్యాహ్నం)",
+        filter_alpharam: "అల్పాహారం (రాత్రి)",
+        btn_clear_filter: "అన్నీ చూపించు (Show All)",
+        btn_show_all: "అన్నీ చూపించు",
+        filter_today_label: "ఫిల్టర్: ఈ రోజు (Today)",
+        heading_schedules: "నిశ్చయించిన సమయాలు",
+        empty_title: "ఎటువంటి వివరాలు లేవు",
+        empty_desc: "ప్రస్తుతం ఎలాంటి భిక్ష లేదా అల్పాహార సమయాలు లేవు. గురుస్వామి కొత్త షెడ్యూల్‌ను జోడించవచ్చు.",
+        empty_today_title: "ఈరోజు ఎలాంటి సమయాలు లేవు",
+        empty_today_desc: "ఈరోజుకు సంబంధించి ఎలాంటి భిక్ష లేదా అల్పాహార సమయాలు నిశ్చయించబడలేదు. గురుస్వామి కొత్త సమయాన్ని జోడించవచ్చు.",
+        btn_view_all: "అన్ని షెడ్యూల్స్ చూడండి",
+        card_host: "నిర్వాహకులు",
+        card_phone: "ఫోన్",
+        card_venue: "వేదిక",
+        btn_directions: "మ్యాప్స్ మార్గం",
+        btn_whatsapp: "వాట్సాప్ ఆహ్వానం",
+        admin_login_title: "గురుస్వామి అడ్మిన్ డెస్క్",
+        admin_login_subtitle: "షెడ్యూల్స్ నిర్వహించడానికి సెక్యూరిటీ పిన్ నమోదు చేయండి",
+        admin_default_pin_hint: "డిఫాల్ట్ పిన్: 108 (Default PIN: 108)",
+        btn_login_admin: "లాగిన్ చేయండి",
+        admin_title: "గురుస్వామి డెస్క్",
+        btn_logout: "లాగౌట్",
+        label_type: "కార్యక్రమ విభాగం (Type) *",
+        label_date: "తేదీ (Date) *",
+        label_time: "సమయం (Time) *",
+        label_host: "స్వామి / భక్తుని పేరు (Host) *",
+        label_phone: "ఫోన్ నంబర్ (Phone) *",
+        label_address: "వేదిక / చిరునామా (Address - ఐచ్ఛికం)",
+        label_maps_url: "గూగుల్ మ్యాప్స్ లింక్ (Google Maps URL - ఐచ్ఛికం)",
+        btn_cancel: "రద్దు",
+        btn_save_schedule: "భద్రపరచండి",
+        admin_banner_title: "ముఖ్య గమనిక బ్యానర్ (Ticker)",
+        admin_pin_change_hint: "సెక్యూరిటీ పిన్ మార్పు:",
+        btn_change_pin: "పిన్ మార్చండి",
+        placeholder_host: "శ్రీ రమణ స్వామి",
+        placeholder_address: "డోర్ నెం, వీధి, ల్యాండ్‌మార్క్ (ఐచ్ఛికం)",
+        placeholder_banner: "ముఖ్య ప్రకటన...",
+        venue_to_be_updated: "స్థలం: వివరాలు త్వరలో",
+        toast_saved: "షెడ్యూల్ విజయవంతంగా భద్రపరచబడింది.",
+        toast_deleted: "షెడ్యూల్ తొలగించబడింది.",
+        toast_banner_saved: "గమనిక నవీకరించబడింది.",
+        toast_invalid_pin: "తప్పుడు పిన్. దయచేసి మళ్లీ ప్రయత్నించండి.",
+        toast_login_success: "అడ్మిన్ లాగిన్ విజయవంతమైంది.",
+        toast_pin_changed: "సెక్యూరిటీ పిన్ మార్చబడింది.",
+        translating: "అనువదిస్తోంది..."
+      },
+      en: {
+        app_title: "Ayyappa Biksha Calendar",
+        app_subtitle: "Swamiye Saranam Ayyappa • Biksha & Alpharam",
+        badge_alert: "Notice",
+        btn_today: "Today",
+        type_biksha_short: "Biksha",
+        type_alpharam_short: "Alpharam",
+        type_biksha: "Biksha (Afternoon Lunch)",
+        type_alpharam: "Alpharam (Night Tiffin)",
+        type_biksha_opt: "☀️ Biksha (Lunch)",
+        type_alpharam_opt: "🌙 Alpharam (Tiffin)",
+        filter_all: "All Schedules",
+        filter_biksha: "Biksha (Lunch)",
+        filter_alpharam: "Alpharam (Night)",
+        btn_clear_filter: "Show All",
+        btn_show_all: "Show All",
+        filter_today_label: "Filtered: Today",
+        heading_schedules: "Scheduled Timings",
+        empty_title: "No Schedules Available",
+        empty_desc: "No Biksha or Alpharam schedules available. Guruswamy can add a new schedule.",
+        empty_today_title: "No schedules for today",
+        empty_today_desc: "No Biksha or Alpharam schedules found for today. Guruswamy can add a new schedule.",
+        btn_view_all: "View All Schedules",
+        card_host: "Host Swamy",
+        card_phone: "Phone",
+        card_venue: "Venue",
+        btn_directions: "Directions",
+        btn_whatsapp: "Share on WhatsApp",
+        admin_login_title: "Guruswamy Admin Desk",
+        admin_login_subtitle: "Enter security PIN to manage Biksha schedules",
+        admin_default_pin_hint: "Default PIN: 108",
+        btn_login_admin: "Login to Admin",
+        admin_title: "Guruswamy Desk",
+        btn_logout: "Logout",
+        label_type: "Schedule Type *",
+        label_date: "Date *",
+        label_time: "Time *",
+        label_host: "Host Swamy / Name *",
+        label_phone: "Phone Number *",
+        label_address: "Venue Address & Landmark (Optional)",
+        label_maps_url: "Google Maps URL (Optional)",
+        btn_cancel: "Cancel",
+        btn_save_schedule: "Save Schedule",
+        admin_banner_title: "Urgent Notice Banner (Ticker)",
+        admin_pin_change_hint: "Security PIN setting:",
+        btn_change_pin: "Change PIN",
+        placeholder_host: "Sri Ramana Swamy",
+        placeholder_address: "Door No, Street, Landmark (Optional)",
+        placeholder_banner: "Important notice...",
+        venue_to_be_updated: "Venue: Details to be updated soon",
+        toast_saved: "Schedule saved successfully.",
+        toast_deleted: "Schedule removed successfully.",
+        toast_banner_saved: "Notice banner updated.",
+        toast_invalid_pin: "Invalid PIN. Please try again.",
+        toast_login_success: "Admin login successful.",
+        toast_pin_changed: "Security PIN updated.",
+        translating: "Translating..."
+      }
+    };
+
+    const monthNames = {
+      te: ["జనవరి", "ఫిబ్రవరి", "మార్చి", "ఏప్రిల్", "మే", "జూన్", "జూలై", "ఆగస్టు", "సెప్టెంబరు", "అక్టోబరు", "నవంబరు", "డిసెంబరు"],
+      en: ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"]
+    };
+
+    const dayLabels = {
+      te: ["ఆది", "సోమ", "మంగళ", "బుధ", "గురు", "శుక్ర", "శని"],
+      en: ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"]
+    };
+
+    /**
+     * Helpers for Dynamic Realistic Dates
+     */
+    function getOffsetDate(daysOffset) {
+      const d = new Date();
+      d.setDate(d.getDate() + daysOffset);
+      const yyyy = d.getFullYear();
+      const mm = String(d.getMonth() + 1).padStart(2, '0');
+      const dd = String(d.getDate()).padStart(2, '0');
+      return `${yyyy}-${mm}-${dd}`;
+    }
+
+    function getTodayDateStr() {
+      const today = new Date();
+      const yyyy = today.getFullYear();
+      const mm = String(today.getMonth() + 1).padStart(2, '0');
+      const dd = String(today.getDate()).padStart(2, '0');
+      return `${yyyy}-${mm}-${dd}`;
+    }
+
+    /**
+     * =========================================================================
+     * STRICT 12-HOUR (AM/PM) TIME UTILITIES
+     * Converts any 24h/12h time string strictly to "hh:mm AM/PM"
+     * =========================================================================
+     */
+    function formatTo12Hour(timeStr) {
+      if (!timeStr || typeof timeStr !== 'string') return '12:30 PM';
+      const trimmed = timeStr.trim().toUpperCase();
+
+      // Check if already 12-hour format e.g. "12:30 PM", "8:00 PM"
+      const match12 = trimmed.match(/^(\d{1,2}):(\d{2})\s*(AM|PM)$/i);
+      if (match12) {
+        const hh = String(parseInt(match12[1], 10)).padStart(2, '0');
+        const mm = String(parseInt(match12[2], 10)).padStart(2, '0');
+        const period = match12[3].toUpperCase();
+        return `${hh}:${mm} ${period}`;
+      }
+
+      // Check if 24-hour format e.g. "12:30", "20:00", "08:00"
+      const match24 = trimmed.match(/^(\d{1,2}):(\d{2})/);
+      if (match24) {
+        let hour = parseInt(match24[1], 10);
+        const mm = String(parseInt(match24[2], 10)).padStart(2, '0');
+        const period = hour >= 12 ? 'PM' : 'AM';
+        hour = hour % 12;
+        if (hour === 0) hour = 12;
+        const hh = String(hour).padStart(2, '0');
+        return `${hh}:${mm} ${period}`;
+      }
+
+      return trimmed || '12:30 PM';
+    }
+
+    function parseTimeParts(timeStr) {
+      const formatted = formatTo12Hour(timeStr);
+      const match = formatted.match(/^(\d{1,2}):(\d{2})\s*(AM|PM)$/i);
+      if (match) {
+        return {
+          hour: String(parseInt(match[1], 10)).padStart(2, '0'),
+          minute: String(parseInt(match[2], 10)).padStart(2, '0'),
+          period: match[3].toUpperCase()
+        };
+      }
+      return { hour: '12', minute: '30', period: 'PM' };
+    }
+
+    function getSortableMinutes(timeStr) {
+      const parts = parseTimeParts(timeStr);
+      let hour = parseInt(parts.hour, 10) % 12;
+      if (parts.period === 'PM') hour += 12;
+      return hour * 60 + parseInt(parts.minute, 10);
+    }
+
+    function syncCustomTimeInputs() {
+      const hEl = document.getElementById('formTimeHour');
+      const mEl = document.getElementById('formTimeMinute');
+      const pEl = document.getElementById('formTimePeriod');
+      const timeInput = document.getElementById('formTime');
+      if (!hEl || !mEl || !pEl || !timeInput) return;
+      const hh = hEl.value || '12';
+      const mm = mEl.value || '30';
+      const period = pEl.value || 'PM';
+      timeInput.value = `${hh}:${mm} ${period}`;
+    }
+
+    function setTimeInputs(timeStr) {
+      const parts = parseTimeParts(timeStr || '12:30 PM');
+      const hEl = document.getElementById('formTimeHour');
+      const mEl = document.getElementById('formTimeMinute');
+      const pEl = document.getElementById('formTimePeriod');
+      const timeInput = document.getElementById('formTime');
+      if (hEl) hEl.value = parts.hour;
+      if (mEl) mEl.value = parts.minute;
+      if (pEl) pEl.value = parts.period;
+      if (timeInput) timeInput.value = `${parts.hour}:${parts.minute} ${parts.period}`;
+    }
+
+    /**
+     * Default Schedules: Initialized to empty array (No mock or seed events)
+     */
+    const defaultSeedEvents = [];
+    const MOCK_EVENT_IDS = new Set(['sch_1', 'sch_2', 'sch_3', 'sch_4', 'sch_5']);
+
+    /**
+     * =========================================================================
+     * FIREBASE REALTIME DATABASE CONFIGURATION & INITIALIZATION
+     * =========================================================================
+     */
+    const firebaseConfig = {
+      apiKey: "AIzaSyAclmk7qW3XhT8XW882bwnv8A4exWGA3a8",
+      authDomain: "ayyappa-calendar.firebaseapp.com",
+      databaseURL: "https://ayyappa-calendar-default-rtdb.firebaseio.com",
+      projectId: "ayyappa-calendar",
+      storageBucket: "ayyappa-calendar.firebasestorage.app",
+      messagingSenderId: "275968899343",
+      appId: "1:275968899343:web:cf7922b89fe3869603267a"
+    };
+
+    let rtdb = null;
+    let eventsRef = null;
+    let bannerRef = null;
+    let configRef = null;
+
+    try {
+      if (typeof firebase !== 'undefined') {
+        if (!firebase.apps || !firebase.apps.length) {
+          firebase.initializeApp(firebaseConfig);
+        }
+        rtdb = firebase.database();
+        eventsRef = rtdb.ref('events');
+        bannerRef = rtdb.ref('banner');
+        configRef = rtdb.ref('config');
+      }
+    } catch (err) {
+      console.warn("Firebase initialization notice:", err);
+    }
+
+    /**
+     * Application State
+     */
+    let currentLang = localStorage.getItem('ayyappa_lang') || 'te';
+    if (currentLang !== 'te' && currentLang !== 'en') currentLang = 'te';
+
+    let currentCategory = 'all'; // 'all', 'biksha', 'alpharam'
+    let selectedCalendarDate = null; // 'YYYY-MM-DD' or null
+    let currentViewingDate = new Date();
+    let isAdminLoggedIn = false;
+    let guruswamyPin = localStorage.getItem('ayyappa_admin_pin') || '108';
+
+    // Parse items received from Firebase Realtime Database
+    function parseFirebaseEvents(data) {
+      if (!data) return [];
+      if (Array.isArray(data)) {
+        return data.filter(Boolean);
+      }
+      if (typeof data === 'object') {
+        return Object.keys(data).map(key => {
+          const item = data[key];
+          if (!item || typeof item !== 'object') return null;
+          return {
+            ...item,
+            id: item.id || key
+          };
+        }).filter(Boolean);
+      }
+      return [];
+    }
+
+    // Centralized Storage Helper: Syncs in-memory, local device fallback cache, and Firebase Realtime Database
+    function saveEventsToStorage(eventsList) {
+      schedules = eventsList;
+      window.schedules = schedules;
+
+      // 1. Local device fallback cache
+      try {
+        const serialized = JSON.stringify(eventsList);
+        localStorage.setItem('ayyappa_events', serialized);
+        localStorage.setItem('ayyappa_biksha_events', serialized);
+      } catch (e) { }
+
+      // 2. Firebase RTDB Sync
+      if (eventsRef) {
+        try {
+          const eventsMap = {};
+          eventsList.forEach(item => {
+            if (item && item.id) {
+              eventsMap[item.id] = item;
+            }
+          });
+          eventsRef.set(eventsMap).catch(err => {
+            console.warn("Firebase RTDB set error:", err);
+          });
+        } catch (e) {
+          console.warn("Firebase RTDB sync error:", e);
+        }
+      }
+    }
+
+    /**
+     * =========================================================================
+     * AUTOMATIC PURGE / CLEANUP MECHANISM (PAST EVENTS REMOVAL AT MIDNIGHT)
+     * Permanently deletes any event scheduled strictly before today (00:00:00)
+     * Also migrates and purges legacy mock/seed events if present in storage/RTDB
+     * =========================================================================
+     */
+    function cleanupPastEvents() {
+      let events = [];
+      const storedStr = localStorage.getItem('ayyappa_events') || localStorage.getItem('ayyappa_biksha_events');
+      if (storedStr !== null) {
+        try {
+          events = JSON.parse(storedStr);
+          if (!Array.isArray(events)) events = [];
+        } catch (e) {
+          events = [];
+        }
+      } else {
+        events = [];
+      }
+
+      // One-time cleanup & migration: purge any previous sample/mock seed events
+      const hasMockSeeds = events.some(e => e && MOCK_EVENT_IDS.has(e.id));
+      if (hasMockSeeds || localStorage.getItem('ayyappa_seeds_purged_v2') !== 'true') {
+        events = events.filter(e => e && !MOCK_EVENT_IDS.has(e.id));
+        localStorage.setItem('ayyappa_seeds_purged_v2', 'true');
+      }
+
+      // Get start of today (midnight 00:00:00) in local timezone
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+
+      // Filter out any event whose date is strictly before today
+      const pastEventIds = [];
+      const activeEvents = events.filter(event => {
+        if (!event || !event.date) return false;
+        // event.date is expected in 'YYYY-MM-DD' format
+        const eventDate = new Date(event.date + 'T00:00:00');
+        const isCurrentOrFuture = eventDate >= today;
+        if (!isCurrentOrFuture && event.id) {
+          pastEventIds.push(event.id);
+        }
+        return isCurrentOrFuture;
+      });
+
+      // Update in-memory schedules & local storage cache
+      schedules = activeEvents;
+      window.schedules = schedules;
+      try {
+        const serialized = JSON.stringify(activeEvents);
+        localStorage.setItem('ayyappa_events', serialized);
+        localStorage.setItem('ayyappa_biksha_events', serialized);
+      } catch (e) { }
+
+      // Purge past events from Firebase RTDB if any
+      if (pastEventIds.length > 0 && eventsRef) {
+        pastEventIds.forEach(pid => {
+          eventsRef.child(pid).remove().catch(e => { });
+        });
+      }
+
+      return activeEvents;
+    }
+
+    /**
+     * Live Midnight Transition Timer: Purges past events automatically at 12:00:01 AM
+     */
+    let midnightTimer = null;
+    function scheduleMidnightCleanup() {
+      clearTimeout(midnightTimer);
+      const now = new Date();
+      const nextMidnight = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1, 0, 0, 1);
+      const msUntilMidnight = Math.max(1000, nextMidnight.getTime() - now.getTime());
+
+      midnightTimer = setTimeout(() => {
+        cleanupPastEvents();
+        renderCalendar();
+        renderSchedules();
+        scheduleMidnightCleanup();
+      }, msUntilMidnight);
+    }
+
+    // Initialize schedules with auto-cleanup of past events
+    let schedules = [];
+    cleanupPastEvents();
+
+    window.schedules = schedules;
+    window.cleanupPastEvents = cleanupPastEvents;
+    window.saveEventsToStorage = saveEventsToStorage;
+
+    /**
+     * Realtime Database Sync Listener Engine
+     */
+    let isFirebaseListenerAttached = false;
+    function initFirebaseSync() {
+      if (isFirebaseListenerAttached || !eventsRef) return;
+      isFirebaseListenerAttached = true;
+
+      // Realtime listener for schedules
+      eventsRef.on('value', (snapshot) => {
+        const rawData = snapshot.val();
+        const incomingEvents = parseFirebaseEvents(rawData);
+
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+
+        const pastIds = [];
+        const activeEvents = incomingEvents.filter(ev => {
+          if (!ev || !ev.date) return false;
+          // Discard mock seed events if any existed in database
+          if (MOCK_EVENT_IDS.has(ev.id)) {
+            pastIds.push(ev.id);
+            return false;
+          }
+          const evDate = new Date(ev.date + 'T00:00:00');
+          const isCurrentOrFuture = evDate >= today;
+          if (!isCurrentOrFuture && ev.id) {
+            pastIds.push(ev.id);
+          }
+          return isCurrentOrFuture;
+        });
+
+        // Automatically clean past events from Firebase in background
+        if (pastIds.length > 0) {
+          pastIds.forEach(pid => {
+            eventsRef.child(pid).remove().catch(e => { });
+          });
+        }
+
+        schedules = activeEvents;
+        window.schedules = schedules;
+
+        // Sync local cache
+        try {
+          const serialized = JSON.stringify(schedules);
+          localStorage.setItem('ayyappa_events', serialized);
+          localStorage.setItem('ayyappa_biksha_events', serialized);
+        } catch (e) { }
+
+        // Reactive UI render
+        renderCalendar();
+        renderSchedules();
+      }, (error) => {
+        console.warn("Firebase RTDB events listener notice:", error);
+      });
+
+      // Realtime listener for broadcast banner
+      if (bannerRef) {
+        bannerRef.on('value', (snapshot) => {
+          const val = snapshot.val();
+          if (val && typeof val === 'object') {
+            bannerData = { ...bannerData, ...val };
+            try {
+              localStorage.setItem('ayyappa_banner', JSON.stringify(bannerData));
+            } catch (e) { }
+            renderBroadcastBanner();
+          }
+        }, (error) => {
+          console.warn("Firebase RTDB banner listener notice:", error);
+        });
+      }
+
+      // Realtime listener for security PIN
+      if (configRef) {
+        configRef.child('adminPin').on('value', (snapshot) => {
+          const remotePin = snapshot.val();
+          if (remotePin) {
+            guruswamyPin = String(remotePin).trim();
+            try {
+              localStorage.setItem('ayyappa_admin_pin', guruswamyPin);
+            } catch (e) { }
+          }
+        }, (error) => {
+          console.warn("Firebase RTDB PIN listener notice:", error);
+        });
+      }
+    }
+
+    // Start Firebase Realtime Database Sync immediately if available
+    initFirebaseSync();
+
+    // Emergency Broadcast Banner State (Bilingual support)
+    let bannerData = {
+      active: true,
+      text_te: "స్వామి శరణం: నేటి మధ్యాహ్నం భిక్ష సమయం 12:30 PM కు ప్రారంభమవుతుంది.",
+      text_en: "Swami Saranam: Today's Afternoon Biksha commences at 12:30 PM."
+    };
+    try {
+      const storedBanner = localStorage.getItem('ayyappa_banner');
+      if (storedBanner) {
+        const parsed = JSON.parse(storedBanner);
+        if (parsed.text && !parsed.text_te) {
+          bannerData.text_te = parsed.text;
+          bannerData.text_en = parsed.text;
+        } else {
+          bannerData = parsed;
+        }
+      }
+    } catch (e) { }
+
+    /**
+     * =========================================================================
+     * DYNAMIC AUTO-TRANSLATION & TRANSLITERATION ENGINE
+     * Free Client-Side Google Translate + LocalStorage Caching Layer
+     * =========================================================================
+     */
+    const initialSeedTranslations = {
+      // Seed 1
+      "శ్రీ రమణ స్వామి & కుటుంబం_en": "Sri Ramana Swamy & Family",
+      "Sri Ramana Swamy & Family_te": "శ్రీ రమణ స్వామి & కుటుంబం",
+      "ప్లాట్ నెం. 108, అయ్యప్ప ఆలయ వీధి, గాంధీ నగర్, విజయవాడ_en": "Plot No. 108, Ayyappa Temple St, Gandhi Nagar, Vijayawada",
+      "Plot No. 108, Ayyappa Temple St, Gandhi Nagar, Vijayawada_te": "ప్లాట్ నెం. 108, అయ్యప్ప ఆలయ వీధి, గాంధీ నగర్, విజయవాడ",
+
+      // Seed 2
+      "శ్రీ వెంకటేశ్వర స్వామి (గురుస్వామి నివాసం)_en": "Sri Venkateswara Swamy (Guruswamy Residence)",
+      "Sri Venkateswara Swamy (Guruswamy Residence)_te": "శ్రీ వెంకటేశ్వర స్వామి (గురుస్వామి నివాసం)",
+      "డోర్ నెం. 4-12, శివాలయం ఎదురుగా, గుంటూరు_en": "Door No. 4-12, Opp. Shiva Temple, Guntur",
+      "Door No. 4-12, Opp. Shiva Temple, Guntur_te": "డోర్ నెం. 4-12, శివాలయం ఎదురుగా, గుంటూరు",
+
+      // Seed 3
+      "శ్రీ కృష్ణమూర్తి స్వామి_en": "Sri Krishnamurthy Swamy",
+      "Sri Krishnamurthy Swamy_te": "శ్రీ కృష్ణమూర్తి స్వామి",
+      "ఫ్లాట్ 204, సాయి బాలాజీ నిలయం, మణికొండ, హైదరాబాద్_en": "Flat 204, Sai Balaji Nilayam, Manikonda, Hyderabad",
+      "Flat 204, Sai Balaji Nilayam, Manikonda, Hyderabad_te": "ఫ్లాట్ 204, సాయి బాలాజీ నిలయం, మణికొండ, హైదరాబాద్",
+
+      // Seed 4
+      "శ్రీ సుబ్రహ్మణ్య స్వామి & భక్త బృందం_en": "Sri Subrahmanya Swamy & Devotees Group",
+      "Sri Subrahmanya Swamy & Devotees Group_te": "శ్రీ సుబ్రహ్మణ్య స్వామి & భక్త బృందం",
+      "కల్యాణ మండపం హాల్, ఆర్టీసీ బస్టాండ్ రోడ్డు, రాజమండ్రి_en": "Kalyana Mandapam Hall, RTC Bus Stand Road, Rajahmundry",
+      "Kalyana Mandapam Hall, RTC Bus Stand Road, Rajahmundry_te": "కల్యాణ మండపం హాల్, ఆర్టీసీ బస్టాండ్ రోడ్డు, రాజమండ్రి",
+
+      // Seed 5
+      "శ్రీ సత్యనారాయణ గురుస్వామి_en": "Sri Satyanarayana Guruswamy",
+      "Sri Satyanarayana Guruswamy_te": "శ్రీ సత్యనారాయణ గురుస్వామి",
+      "శ్రీ అయ్యప్ప సేవా సమాజం, తిలక్ రోడ్డు, తిరుపతి_en": "Sri Ayyappa Seva Samaja, Tilak Road, Tirupati",
+      "Sri Ayyappa Seva Samaja, Tilak Road, Tirupati_te": "శ్రీ అయ్యప్ప సేవా సమాజం, తిలక్ రోడ్డు, తిరుపతి",
+
+      // Example test cases requested
+      "Ramesh Swamy_te": "రమేష్ స్వామి",
+      "రమేష్ స్వామి_en": "Ramesh Swamy",
+      "RTC Colony, Near Temple_te": "ఆర్టీసీ కాలనీ, గుడి దగ్గర",
+      "ఆర్టీసీ కాలనీ, గుడి దగ్గర_en": "RTC Colony, Near Temple",
+
+      // Default Banner
+      "స్వామి శరణం: నేటి మధ్యాహ్నం భిక్ష సమయం 12:30 PM కు ప్రారంభమవుతుంది._en": "Swami Saranam: Today's Afternoon Biksha commences at 12:30 PM.",
+      "Swami Saranam: Today's Afternoon Biksha commences at 12:30 PM._te": "స్వామి శరణం: నేటి మధ్యాహ్నం భిక్ష సమయం 12:30 PM కు ప్రారంభమవుతుంది."
+    };
+
+    let translationCache = {};
+    try {
+      const storedCache = localStorage.getItem('ayyappa_translations_cache');
+      if (storedCache) {
+        translationCache = JSON.parse(storedCache);
+      }
+    } catch (e) { }
+
+    // Merge seed translations into cache
+    Object.keys(initialSeedTranslations).forEach(key => {
+      if (!translationCache[key]) {
+        translationCache[key] = initialSeedTranslations[key];
+      }
+    });
+
+    function saveTranslationCache() {
+      try {
+        localStorage.setItem('ayyappa_translations_cache', JSON.stringify(translationCache));
+      } catch (e) { }
+    }
+
+    function hasTelugu(str) {
+      return /[\u0C00-\u0C7F]/.test(str);
+    }
+
+    function hasLatin(str) {
+      return /[a-zA-Z]/.test(str);
+    }
+
+    function needsTranslation(text, targetLang) {
+      if (!text || typeof text !== 'string') return false;
+      const trimmed = text.trim();
+      if (!trimmed) return false;
+      if (/^[\d\s\+\-\(\)\:\,\.\/]+$/.test(trimmed)) return false;
+
+      if (targetLang === 'te') {
+        return hasLatin(trimmed);
+      } else if (targetLang === 'en') {
+        return hasTelugu(trimmed);
+      }
+      return false;
+    }
+
+    function getCacheKey(text, targetLang) {
+      return `${(text || '').trim()}_${targetLang}`;
+    }
+
+    function getCachedTranslation(text, targetLang) {
+      if (!text) return '';
+      const trimmed = text.trim();
+      if (!needsTranslation(trimmed, targetLang)) {
+        return trimmed;
+      }
+      const key = getCacheKey(trimmed, targetLang);
+      return translationCache[key] || null;
+    }
+
+    function showTranslatingSpinner(show) {
+      const spinner = document.getElementById('transSpinner');
+      if (!spinner) return;
+      if (show) {
+        spinner.classList.remove('hidden');
+        spinner.classList.add('inline-flex');
+      } else {
+        spinner.classList.add('hidden');
+        spinner.classList.remove('inline-flex');
+      }
+    }
+
+    async function translateText(text, targetLang) {
+      if (!text || typeof text !== 'string') return '';
+      const trimmed = text.trim();
+      if (!needsTranslation(trimmed, targetLang)) {
+        return trimmed;
+      }
+      const key = getCacheKey(trimmed, targetLang);
+      if (translationCache[key]) {
+        return translationCache[key];
+      }
+
+      try {
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 4000);
+        const url = `https://translate.googleapis.com/translate_a/single?client=gtx&sl=auto&tl=${targetLang}&dt=t&q=${encodeURIComponent(trimmed)}`;
+
+        const response = await fetch(url, { signal: controller.signal });
+        clearTimeout(timeoutId);
+
+        if (response.ok) {
+          const data = await response.json();
+          if (Array.isArray(data) && Array.isArray(data[0])) {
+            const translated = data[0].map(s => s[0]).join('').trim();
+            if (translated) {
+              translationCache[key] = translated;
+              saveTranslationCache();
+              return translated;
+            }
+          }
+        }
+      } catch (err) {
+        console.warn('Translation offline/failed for:', trimmed, err.message);
+      }
+      return trimmed;
+    }
+
+    async function getOrFetchTranslation(text, targetLang) {
+      const cached = getCachedTranslation(text, targetLang);
+      if (cached !== null) return cached;
+      return await translateText(text, targetLang);
+    }
+
+    async function processUncachedTasks(tasks, targetLang) {
+      if (!tasks || tasks.length === 0) return;
+      showTranslatingSpinner(true);
+
+      try {
+        await Promise.all(tasks.map(async task => {
+          if (currentLang !== targetLang) return;
+          const translated = await translateText(task.text, targetLang);
+          if (currentLang === targetLang) {
+            const el = document.getElementById(task.elId);
+            if (el && translated) {
+              el.textContent = translated;
+            }
+            const sch = schedules.find(s => s.id === task.itemId);
+            if (sch && translated) {
+              sch[task.field] = translated;
+            }
+          }
+        }));
+        saveEventsToStorage(schedules);
+      } finally {
+        showTranslatingSpinner(false);
+      }
+    }
+
+    async function preTranslateSchedule(schId, host, address, targetLang) {
+      try {
+        const transHost = host ? await getOrFetchTranslation(host, targetLang) : '';
+        const transAddr = (address && address.trim()) ? await getOrFetchTranslation(address, targetLang) : '';
+        const sch = schedules.find(s => s.id === schId);
+        if (sch) {
+          if (targetLang === 'en') {
+            sch.host_en = transHost;
+            sch.address_en = transAddr;
+          } else {
+            sch.host_te = transHost;
+            sch.address_te = transAddr;
+          }
+          if (eventsRef) {
+            eventsRef.child(schId).update({
+              host_en: sch.host_en || '',
+              address_en: sch.address_en || '',
+              host_te: sch.host_te || '',
+              address_te: sch.address_te || ''
+            }).catch(e => { });
+          }
+          saveEventsToStorage(schedules);
+        }
+      } catch (e) { }
+    }
+
+    /**
+     * =========================================================================
+     * REACTIVE BILINGUAL ENGINE: switchLanguage(lang)
+     * =========================================================================
+     */
+    function switchLanguage(lang) {
+      if (lang !== 'te' && lang !== 'en') lang = 'te';
+      currentLang = lang;
+      window.currentLang = lang;
+      try {
+        localStorage.setItem('ayyappa_lang', lang);
+      } catch (e) { }
+      document.documentElement.lang = lang;
+
+      // 1. Update Header Toggle Buttons
+      const teBtn = document.getElementById('langBtnTe');
+      const enBtn = document.getElementById('langBtnEn');
+      if (teBtn && enBtn) {
+        if (lang === 'te') {
+          teBtn.className = "px-2.5 py-1 rounded-md bg-terracotta-700 text-white font-bold shadow-xs transition-all";
+          enBtn.className = "px-2.5 py-1 rounded-md text-charcoal-800 hover:text-terracotta-800 font-medium transition-all";
+        } else {
+          enBtn.className = "px-2.5 py-1 rounded-md bg-terracotta-700 text-white font-bold shadow-xs transition-all";
+          teBtn.className = "px-2.5 py-1 rounded-md text-charcoal-800 hover:text-terracotta-800 font-medium transition-all";
+        }
+      }
+
+      // 2. Update all static [data-i18n] nodes
+      document.querySelectorAll('[data-i18n]').forEach(el => {
+        const key = el.getAttribute('data-i18n');
+        if (i18n[lang] && i18n[lang][key] !== undefined) {
+          el.textContent = i18n[lang][key];
+        }
+      });
+
+      // 3. Update input placeholders [data-i18n-placeholder]
+      document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
+        const key = el.getAttribute('data-i18n-placeholder');
+        if (i18n[lang] && i18n[lang][key] !== undefined) {
+          el.setAttribute('placeholder', i18n[lang][key]);
+        }
+      });
+
+      // 4. Critically trigger immediate re-render of dynamic components
+      renderBroadcastBanner();
+      renderCalendar();
+      updateDateFilterBarUI();
+      renderSchedules();
+      updateAdminModalHeader();
+
+      if (window.lucide) {
+        lucide.createIcons();
+      }
+    }
+
+    // Ensure aliases
+    window.switchLanguage = switchLanguage;
+    window.updateLanguage = switchLanguage;
+    window.renderEventList = renderSchedules;
+    window.renderBanner = renderBroadcastBanner;
+    window.filterToToday = filterToToday;
+    window.clearSelectedDateFilter = clearSelectedDateFilter;
+    window.goToCurrentMonth = goToCurrentMonth;
+    window.openAdminModal = openAdminModal;
+    window.closeAdminModal = closeAdminModal;
+    window.handleTypeChange = handleTypeChange;
+    window.formatTo12Hour = formatTo12Hour;
+    window.setTimeInputs = setTimeInputs;
+
+    /**
+     * =========================================================================
+     * TOP BROADCAST TICKER
+     * =========================================================================
+     */
+    async function renderBroadcastBanner() {
+      const banner = document.getElementById('broadcastBanner');
+      const textEl = document.getElementById('broadcastBannerText');
+      const toggle = document.getElementById('adminBannerToggle');
+      const input = document.getElementById('adminBannerInput');
+
+      const rawText = bannerData.text || bannerData.text_te || bannerData.text_en || '';
+      if (!bannerData.active || !rawText.trim()) {
+        banner.classList.add('hidden');
+        if (toggle) toggle.checked = false;
+        if (input) input.value = '';
+        return;
+      }
+
+      banner.classList.remove('hidden');
+      if (toggle) toggle.checked = true;
+
+      // Choose best available text immediately (Cache first)
+      let currentBannerText = currentLang === 'te'
+        ? (bannerData.text_te || getCachedTranslation(rawText, 'te') || rawText)
+        : (bannerData.text_en || getCachedTranslation(rawText, 'en') || rawText);
+
+      textEl.textContent = currentBannerText;
+      if (input) input.value = rawText;
+
+      // Fetch if needed and not yet cached
+      if (needsTranslation(rawText, currentLang) && !getCachedTranslation(rawText, currentLang)) {
+        showTranslatingSpinner(true);
+        const translated = await translateText(rawText, currentLang);
+        if (currentLang === 'te') bannerData.text_te = translated;
+        else bannerData.text_en = translated;
+        textEl.textContent = translated;
+        showTranslatingSpinner(false);
+      }
+    }
+
+    function dismissBanner() {
+      document.getElementById('broadcastBanner').classList.add('hidden');
+    }
+
+    function toggleBannerStatus(active) {
+      bannerData.active = active;
+      try {
+        localStorage.setItem('ayyappa_banner', JSON.stringify(bannerData));
+      } catch (e) { }
+      if (bannerRef) {
+        bannerRef.update({ active: active }).catch(e => console.warn(e));
+      }
+      renderBroadcastBanner();
+    }
+
+    async function saveBannerText() {
+      const val = document.getElementById('adminBannerInput').value.trim();
+      bannerData.text = val;
+      if (currentLang === 'te') {
+        bannerData.text_te = val;
+        bannerData.text_en = '';
+      } else {
+        bannerData.text_en = val;
+        bannerData.text_te = '';
+      }
+      bannerData.active = true;
+      try {
+        localStorage.setItem('ayyappa_banner', JSON.stringify(bannerData));
+      } catch (e) { }
+      if (bannerRef) {
+        bannerRef.set(bannerData).catch(e => console.warn(e));
+      }
+      renderBroadcastBanner();
+      showToast(i18n[currentLang].toast_banner_saved);
+
+      // Pre-translate to opposite language in background
+      const oppositeLang = currentLang === 'te' ? 'en' : 'te';
+      if (needsTranslation(val, oppositeLang)) {
+        const trans = await getOrFetchTranslation(val, oppositeLang);
+        if (oppositeLang === 'en') bannerData.text_en = trans;
+        else bannerData.text_te = trans;
+        try {
+          localStorage.setItem('ayyappa_banner', JSON.stringify(bannerData));
+        } catch (e) { }
+        if (bannerRef) {
+          bannerRef.set(bannerData).catch(e => console.warn(e));
+        }
+      }
+    }
+
+    /**
+     * =========================================================================
+     * CALENDAR LOGIC & TOGGLE DATE FILTER
+     * =========================================================================
+     */
+    function changeMonth(delta) {
+      currentViewingDate.setMonth(currentViewingDate.getMonth() + delta);
+      renderCalendar();
+    }
+
+    function goToCurrentMonth() {
+      filterToToday();
+    }
+
+    function filterToToday() {
+      currentViewingDate = new Date();
+      selectedCalendarDate = getTodayDateStr();
+      updateDateFilterBarUI();
+      renderCalendar();
+      renderSchedules();
+    }
+
+    function renderCalendar() {
+      const year = currentViewingDate.getFullYear();
+      const month = currentViewingDate.getMonth();
+
+      // Month Title
+      document.getElementById('calendarMonthTitle').textContent = `${monthNames[currentLang][month]} ${year}`;
+
+      // Day Names
+      const dayHeader = document.getElementById('calendarDaysHeader');
+      dayHeader.innerHTML = dayLabels[currentLang].map(d => `<span>${d}</span>`).join('');
+
+      // Days calculations
+      const firstDayIdx = new Date(year, month, 1).getDay();
+      const totalDays = new Date(year, month + 1, 0).getDate();
+      const prevTotalDays = new Date(year, month, 0).getDate();
+
+      const grid = document.getElementById('calendarGrid');
+      grid.innerHTML = '';
+
+      const today = new Date();
+      const isCurrentMonth = today.getFullYear() === year && today.getMonth() === month;
+      const todayDate = today.getDate();
+
+      // Leading padding cells from prev month
+      for (let i = firstDayIdx - 1; i >= 0; i--) {
+        const d = prevTotalDays - i;
+        const cell = document.createElement('div');
+        cell.className = "py-1.5 text-[11px] text-slate-300 font-medium select-none";
+        cell.innerHTML = `<span>${d}</span>`;
+        grid.appendChild(cell);
+      }
+
+      // Active month day cells
+      for (let day = 1; day <= totalDays; day++) {
+        const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+        const dayEvents = schedules.filter(s => s.date === dateStr);
+        const hasBiksha = dayEvents.some(s => s.type === 'biksha');
+        const hasAlpharam = dayEvents.some(s => s.type === 'alpharam');
+        const isToday = isCurrentMonth && day === todayDate;
+        const isSelected = selectedCalendarDate === dateStr;
+
+        const cell = document.createElement('button');
+        cell.type = 'button';
+        cell.onclick = () => toggleSelectDate(dateStr);
+        const cellBg = isSelected
+          ? 'bg-amber-100 ring-2 ring-terracotta-700 shadow-xs font-bold text-terracotta-900'
+          : (isToday ? 'bg-sacred-cream font-bold text-charcoal-900 border border-sacred-border' : 'hover:bg-amber-50/70 text-charcoal-800');
+        cell.className = `py-1 rounded-xl flex flex-col items-center justify-center transition-all relative ${cellBg}`;
+
+        // Day Number
+        let html = `<span class="text-xs leading-none">${day}</span>`;
+
+        // High-Contrast Dots: Bright Emerald Green for Biksha, Rich Indigo for Alpharam
+        if (hasBiksha || hasAlpharam) {
+          html += `<div class="flex items-center space-x-1 mt-1">`;
+          if (hasBiksha) {
+            html += `<span class="w-2 h-2 rounded-full bg-emerald-500 ring-1 ring-white shadow-xs" title="Biksha (Lunch)"></span>`;
+          }
+          if (hasAlpharam) {
+            html += `<span class="w-2 h-2 rounded-full bg-indigo-500 ring-1 ring-white shadow-xs" title="Alpharam (Night)"></span>`;
+          }
+          html += `</div>`;
+        } else {
+          html += `<span class="w-2 h-2 mt-1 block"></span>`;
+        }
+
+        cell.innerHTML = html;
+        grid.appendChild(cell);
+      }
+
+      // Trailing padding cells
+      const filled = firstDayIdx + totalDays;
+      const remaining = (filled % 7 === 0) ? 0 : 7 - (filled % 7);
+      for (let i = 1; i <= remaining; i++) {
+        const cell = document.createElement('div');
+        cell.className = "py-1.5 text-[11px] text-slate-300 font-medium select-none";
+        cell.innerHTML = `<span>${i}</span>`;
+        grid.appendChild(cell);
+      }
+    }
+
+    /**
+     * Toggle date filter: Tapping selected date clears it!
+     */
+    function toggleSelectDate(dateStr) {
+      if (selectedCalendarDate === dateStr) {
+        clearSelectedDateFilter();
+        return;
+      }
+      selectedCalendarDate = dateStr;
+      updateDateFilterBarUI();
+      renderCalendar();
+      renderSchedules();
+    }
+
+    function clearSelectedDateFilter() {
+      selectedCalendarDate = null;
+      updateDateFilterBarUI();
+      renderCalendar();
+      renderSchedules();
+    }
+
+    function updateDateFilterBarUI() {
+      const bar = document.getElementById('activeDateFilterBar');
+      const label = document.getElementById('selectedDateLabel');
+      if (selectedCalendarDate) {
+        const todayStr = getTodayDateStr();
+        const isToday = selectedCalendarDate === todayStr;
+        const dObj = new Date(selectedCalendarDate + 'T00:00:00');
+        const formatted = dObj.toLocaleDateString(currentLang === 'te' ? 'te-IN' : 'en-US', {
+          weekday: 'short',
+          month: 'short',
+          day: 'numeric'
+        });
+        if (isToday) {
+          label.textContent = `${i18n[currentLang].filter_today_label || (currentLang === 'te' ? 'ఫిల్టర్: ఈ రోజు' : 'Filtered: Today')}: ${formatted}`;
+        } else {
+          label.textContent = `${currentLang === 'te' ? 'ఎంచుకున్న తేదీ' : 'Selected Date'}: ${formatted}`;
+        }
+        bar.classList.remove('hidden');
+      } else {
+        bar.classList.add('hidden');
+      }
+    }
+
+    /**
+     * =========================================================================
+     * CATEGORY FILTERING & SCHEDULES RENDERING
+     * =========================================================================
+     */
+    function filterCategory(cat) {
+      currentCategory = cat;
+      const allBtn = document.getElementById('catBtn_all');
+      const bikshaBtn = document.getElementById('catBtn_biksha');
+      const alpharamBtn = document.getElementById('catBtn_alpharam');
+
+      // Reset base classes
+      allBtn.className = "cat-pill flex-1 py-1.5 px-2 rounded-xl bg-white hover:bg-amber-50 text-charcoal-800 border border-sacred-border shadow-xs flex items-center justify-center gap-1 text-[11px] whitespace-nowrap";
+      bikshaBtn.className = "cat-pill flex-1 py-1.5 px-2 rounded-xl bg-white hover:bg-emerald-50 text-charcoal-800 border border-sacred-border shadow-xs flex items-center justify-center gap-1 text-[11px] whitespace-nowrap";
+      alpharamBtn.className = "cat-pill flex-1 py-1.5 px-2 rounded-xl bg-white hover:bg-indigo-50 text-charcoal-800 border border-sacred-border shadow-xs flex items-center justify-center gap-1 text-[11px] whitespace-nowrap";
+
+      // Apply distinct high-contrast active styling
+      if (cat === 'all') {
+        allBtn.className = "cat-pill active flex-1 py-1.5 px-2 rounded-xl bg-terracotta-700 text-white shadow-xs flex items-center justify-center gap-1 text-[11px] whitespace-nowrap";
+      } else if (cat === 'biksha') {
+        bikshaBtn.className = "cat-pill active flex-1 py-1.5 px-2 rounded-xl bg-emerald-700 text-white shadow-xs flex items-center justify-center gap-1 text-[11px] whitespace-nowrap";
+      } else if (cat === 'alpharam') {
+        alpharamBtn.className = "cat-pill active flex-1 py-1.5 px-2 rounded-xl bg-indigo-700 text-white shadow-xs flex items-center justify-center gap-1 text-[11px] whitespace-nowrap";
+      }
+
+      renderSchedules();
+    }
+
+    function clearDateFilterAndCategory() {
+      selectedCalendarDate = null;
+      currentCategory = 'all';
+      updateDateFilterBarUI();
+      filterCategory('all');
+      renderCalendar();
+    }
+
+    function renderSchedules() {
+      const container = document.getElementById('schedulesList');
+      const emptyState = document.getElementById('schedulesEmptyState');
+      const countText = document.getElementById('schedulesCountText');
+
+      // Update Badge counts in category tabs
+      const bikshaTotal = schedules.filter(s => s.type === 'biksha').length;
+      const alpharamTotal = schedules.filter(s => s.type === 'alpharam').length;
+      document.getElementById('badgeCount_all').textContent = schedules.length;
+      document.getElementById('badgeCount_biksha').textContent = bikshaTotal;
+      document.getElementById('badgeCount_alpharam').textContent = alpharamTotal;
+
+      // Filter list
+      let filtered = [...schedules];
+
+      if (currentCategory !== 'all') {
+        filtered = filtered.filter(s => s.type === currentCategory);
+      }
+
+      if (selectedCalendarDate) {
+        filtered = filtered.filter(s => s.date === selectedCalendarDate);
+      }
+
+      // Sort by date and 12-hour/24-hour time safely
+      filtered.sort((a, b) => {
+        const dateA = new Date(a.date + 'T00:00:00').getTime();
+        const dateB = new Date(b.date + 'T00:00:00').getTime();
+        if (dateA !== dateB) return dateA - dateB;
+        return getSortableMinutes(a.time) - getSortableMinutes(b.time);
+      });
+
+      countText.textContent = `${filtered.length} ${currentLang === 'te' ? 'కార్యక్రమాలు' : 'Schedules'}`;
+
+      if (filtered.length === 0) {
+        container.innerHTML = '';
+        emptyState.classList.remove('hidden');
+        const isFilteringToday = selectedCalendarDate && selectedCalendarDate === getTodayDateStr();
+        if (isFilteringToday) {
+          document.getElementById('emptyTitle').textContent = i18n[currentLang].empty_today_title || (currentLang === 'te' ? 'ఈరోజు ఎలాంటి సమయాలు లేవు' : 'No schedules for today');
+          document.getElementById('emptyDesc').textContent = i18n[currentLang].empty_today_desc || (currentLang === 'te' ? 'ఈరోజు ఎలాంటి భిక్ష లేదా అల్పాహార సమయాలు లేవు. గురుస్వామి కొత్త షెడ్యూల్‌ను జోడించవచ్చు.' : 'No Biksha or Alpharam schedules found for today. Guruswamy can add a new schedule.');
+        } else {
+          document.getElementById('emptyTitle').textContent = i18n[currentLang].empty_title;
+          document.getElementById('emptyDesc').textContent = i18n[currentLang].empty_desc;
+        }
+        return;
+      }
+
+      emptyState.classList.add('hidden');
+
+      container.innerHTML = filtered.map(item => {
+        const isBiksha = item.type === 'biksha';
+
+        // High-contrast color redesign: Deep Emerald Green (Biksha) vs Deep Royal Indigo (Alpharam)
+        const cardBorderAccent = isBiksha ? 'border-l-4 border-l-emerald-600' : 'border-l-4 border-l-indigo-600';
+
+        const typeBadge = isBiksha
+          ? `<span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-bold bg-[#047857] text-white shadow-xs">
+               <span>☀️</span>
+               <span>${currentLang === 'te' ? 'భిక్ష (మధ్యాహ్నం)' : 'Biksha (Lunch)'}</span>
+             </span>`
+          : `<span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-bold bg-[#4338CA] text-white shadow-xs">
+               <span>🌙</span>
+               <span>${currentLang === 'te' ? 'అల్పాహారం (రాత్రి)' : 'Alpharam (Night)'}</span>
+             </span>`;
+
+        // Date Display
+        const dateObj = new Date(item.date + 'T00:00:00');
+        const formattedDate = dateObj.toLocaleDateString(currentLang === 'te' ? 'te-IN' : 'en-US', {
+          month: 'short',
+          day: 'numeric',
+          weekday: 'short'
+        });
+
+        // Host & Address display resolution (Cache first, immediate)
+        let hostDisplay = item.host;
+        if (currentLang === 'en') {
+          hostDisplay = item.host_en || getCachedTranslation(item.host, 'en') || item.host;
+        } else {
+          hostDisplay = item.host_te || getCachedTranslation(item.host, 'te') || item.host;
+        }
+
+        const rawAddress = (item.address || '').trim();
+        let addressDisplay = rawAddress;
+        if (rawAddress) {
+          if (currentLang === 'en') {
+            addressDisplay = item.address_en || getCachedTranslation(rawAddress, 'en') || rawAddress;
+          } else {
+            addressDisplay = item.address_te || getCachedTranslation(rawAddress, 'te') || rawAddress;
+          }
+        }
+
+        const hasAddress = Boolean(addressDisplay && addressDisplay.trim());
+        const hasMapsUrl = Boolean(item.mapsUrl && item.mapsUrl.trim());
+
+        // Admin actions if logged in
+        let adminActions = '';
+        if (isAdminLoggedIn) {
+          adminActions = `
+            <div class="flex items-center space-x-1">
+              <button onclick="editSchedule('${item.id}')" class="p-1 rounded-lg hover:bg-amber-100 text-terracotta-700" title="Edit">
+                <i data-lucide="edit" class="w-3.5 h-3.5"></i>
+              </button>
+              <button onclick="deleteSchedule('${item.id}')" class="p-1 rounded-lg hover:bg-rose-100 text-rose-700" title="Delete">
+                <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+              </button>
+            </div>
+          `;
+        }
+
+        // Location Row (Address or Subtle 'Venue to be updated' notice)
+        const locationRowHtml = hasAddress
+          ? `<p class="text-xs text-slate-600 flex items-start gap-1.5 leading-snug">
+               <i data-lucide="map-pin" class="w-3.5 h-3.5 text-slate-400 flex-shrink-0 mt-0.5"></i>
+               <span id="addrText_${item.id}" class="truncate-2">${addressDisplay}</span>
+             </p>`
+          : `<p class="text-[11px] text-slate-400 italic flex items-start gap-1.5 leading-snug">
+               <i data-lucide="map-pin" class="w-3.5 h-3.5 text-slate-300 flex-shrink-0 mt-0.5"></i>
+               <span id="addrText_${item.id}">${i18n[currentLang].venue_to_be_updated}</span>
+             </p>`;
+
+        // Action Buttons: Render Google Maps button ONLY if valid URL exists
+        const mapsBtnHtml = hasMapsUrl
+          ? `<a href="${item.mapsUrl.trim()}" target="_blank" rel="noopener noreferrer" class="flex-1 py-1.5 px-2 rounded-xl bg-sacred-ivory hover:bg-amber-50 border border-sacred-border text-charcoal-800 text-xs font-semibold flex items-center justify-center gap-1.5 transition">
+               <i data-lucide="navigation" class="w-3.5 h-3.5 text-terracotta-700"></i>
+               <span>${i18n[currentLang].btn_directions}</span>
+             </a>`
+          : '';
+
+        const actionButtonsHtml = `
+          <div class="flex items-center gap-2 pt-1 border-t border-sacred-border/60">
+            ${mapsBtnHtml}
+            <button onclick="shareWhatsAppInvite('${item.id}')" class="flex-1 py-1.5 px-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold flex items-center justify-center gap-1.5 transition shadow-xs">
+              <i data-lucide="share-2" class="w-3.5 h-3.5"></i>
+              <span>${i18n[currentLang].btn_whatsapp}</span>
+            </button>
+          </div>
+        `;
+
+        return `
+          <article class="bg-white rounded-2xl p-3 sm:p-3.5 border border-sacred-border ${cardBorderAccent} shadow-xs hover:shadow-md transition-all space-y-2.5">
+            
+            <!-- Type Badge, Time & Date -->
+            <div class="flex items-center justify-between">
+              <div class="flex items-center space-x-1.5">
+                ${typeBadge}
+              </div>
+              <div class="flex items-center space-x-2">
+                <span class="text-xs font-bold text-charcoal-900 flex items-center gap-1 bg-sacred-ivory px-2 py-0.5 rounded-lg border border-sacred-border">
+                  <i data-lucide="clock" class="w-3 h-3 text-terracotta-700"></i>
+                  <span>${formatTo12Hour(item.time)}</span>
+                </span>
+                ${adminActions}
+              </div>
+            </div>
+
+            <!-- Date & Host Swamy -->
+            <div class="space-y-1">
+              <div class="flex items-center justify-between text-xs">
+                <p class="font-bold text-charcoal-900 flex items-center gap-1.5">
+                  <i data-lucide="user" class="w-3.5 h-3.5 text-terracotta-700 flex-shrink-0"></i>
+                  <span id="hostText_${item.id}">${hostDisplay}</span>
+                </p>
+                <span class="text-[11px] font-semibold text-slate-500">${formattedDate}</span>
+              </div>
+
+              <!-- Address Landmark or Venue Notice -->
+              ${locationRowHtml}
+            </div>
+
+            <!-- Action Buttons: Google Maps (if present) & WhatsApp Direct Invite -->
+            ${actionButtonsHtml}
+
+          </article>
+        `;
+      }).join('');
+
+      if (window.lucide) lucide.createIcons();
+
+      // Check for items needing background translation fetch
+      const uncachedTasks = [];
+      filtered.forEach(item => {
+        const hKey = getCacheKey(item.host, currentLang);
+        const aKey = getCacheKey(item.address, currentLang);
+
+        const needHost = currentLang === 'en' ? (!item.host_en && needsTranslation(item.host, 'en')) : (!item.host_te && needsTranslation(item.host, 'te'));
+        const needAddr = currentLang === 'en' ? (!item.address_en && needsTranslation(item.address, 'en')) : (!item.address_te && needsTranslation(item.address, 'te'));
+
+        if (needHost && !translationCache[hKey]) {
+          uncachedTasks.push({ elId: `hostText_${item.id}`, text: item.host, itemId: item.id, field: currentLang === 'en' ? 'host_en' : 'host_te' });
+        }
+        if (needAddr && item.address && item.address.trim() && !translationCache[aKey]) {
+          uncachedTasks.push({ elId: `addrText_${item.id}`, text: item.address, itemId: item.id, field: currentLang === 'en' ? 'address_en' : 'address_te' });
+        }
+      });
+
+      if (uncachedTasks.length > 0) {
+        processUncachedTasks(uncachedTasks, currentLang);
+      }
+    }
+
+    /**
+     * 1-Click WhatsApp Direct Invite Formatter (ZERO RSVP TEXT)
+     * Fully Async-Aware: Translates host & venue to active language
+     * Omits Location and Maps lines if optional values are empty
+     */
+    async function shareWhatsAppInvite(id) {
+      const item = schedules.find(s => s.id === id);
+      if (!item) return;
+
+      showTranslatingSpinner(true);
+      let hostDisplay = item.host;
+      const rawAddress = (item.address || '').trim();
+      let addressDisplay = rawAddress;
+
+      try {
+        if (currentLang === 'en') {
+          hostDisplay = item.host_en || await getOrFetchTranslation(item.host, 'en');
+          if (rawAddress) {
+            addressDisplay = item.address_en || await getOrFetchTranslation(rawAddress, 'en');
+          }
+        } else {
+          hostDisplay = item.host_te || await getOrFetchTranslation(item.host, 'te');
+          if (rawAddress) {
+            addressDisplay = item.address_te || await getOrFetchTranslation(rawAddress, 'te');
+          }
+        }
+      } catch (e) { }
+      showTranslatingSpinner(false);
+
+      const dateObj = new Date(item.date + 'T00:00:00');
+      const dateFormatted = dateObj.toLocaleDateString(currentLang === 'te' ? 'te-IN' : 'en-US', {
+        weekday: 'long',
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric'
+      });
+
+      const isBiksha = item.type === 'biksha';
+      const typeStr = isBiksha
+        ? (currentLang === 'te' ? '☀️ మధ్యాహ్నం భిక్ష (Biksha)' : '☀️ Afternoon Biksha (Lunch)')
+        : (currentLang === 'te' ? '🌙 రాత్రి అల్పాహారం (Alpharam)' : '🌙 Night Alpharam (Tiffin)');
+
+      const hasAddress = Boolean(addressDisplay && addressDisplay.trim());
+      const hasMapsUrl = Boolean(item.mapsUrl && item.mapsUrl.trim());
+
+      const locationLineTe = hasAddress ? `📍 *వేదిక / చిరునామా:* ${addressDisplay.trim()}\n` : '';
+      const mapsLineTe = hasMapsUrl ? `🗺️ *గూగుల్ మ్యాప్స్ లొకేషన్:* ${item.mapsUrl.trim()}\n` : '';
+
+      const locationLineEn = hasAddress ? `📍 *Venue Address:* ${addressDisplay.trim()}\n` : '';
+      const mapsLineEn = hasMapsUrl ? `🗺️ *Google Maps Link:* ${item.mapsUrl.trim()}\n` : '';
+
+      let msg = '';
+      if (currentLang === 'te') {
+        msg = `🕉️ *స్వామియే శరణమయ్యప్ప!* 🕉️\n\n` +
+          `అయ్యప్ప భక్తులకు, గురుస్వాములకు సాదర ఆహ్వానం:\n\n` +
+          `🌺 *కార్యక్రమం:* ${typeStr}\n` +
+          `📅 *తేదీ:* ${dateFormatted}\n` +
+          `⏰ *సమయం:* ${formatTo12Hour(item.time)}\n` +
+          `👤 *నిర్వాహకులు:* ${hostDisplay}\n` +
+          `📞 *సంప్రదించండి:* ${item.phone}\n` +
+          locationLineTe +
+          mapsLineTe +
+          `\nస్వాములందరూ సకాలంలో విచ్చేసి అయ్యప్ప స్వామి ప్రసాదాన్ని స్వీకరించగలరు.\n` +
+          `_అయ్యప్ప భిక్ష క్యాలెండర్ ద్వారా పంపబడింది_ 🌿`;
+      } else {
+        msg = `🕉️ *SWAMIYE SARANAM AYYAPPA!* 🕉️\n\n` +
+          `Invitation for Ayyappa Devotees & Guruswamys:\n\n` +
+          `🌺 *Program:* ${typeStr}\n` +
+          `📅 *Date:* ${dateFormatted}\n` +
+          `⏰ *Time:* ${formatTo12Hour(item.time)}\n` +
+          `👤 *Host Swamy:* ${hostDisplay}\n` +
+          `📞 *Contact:* ${item.phone}\n` +
+          locationLineEn +
+          mapsLineEn +
+          `\nAll Swamys are requested to attend and accept the divine prasad.\n` +
+          `_Sent via Ayyappa Biksha Calendar_ 🌿`;
+      }
+
+      const waUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(msg)}`;
+      window.open(waUrl, '_blank');
+    }
+
+    /**
+     * =========================================================================
+     * GURUSWAMY ADMIN DESK (PIN: 108)
+     * =========================================================================
+     */
+    function updateAdminModalHeader() {
+      const titleEl = document.getElementById('adminHeaderTitle');
+      const subEl = document.getElementById('adminHeaderSub');
+      const iconEl = document.getElementById('adminHeaderIcon');
+      if (!titleEl || !subEl) return;
+      if (isAdminLoggedIn) {
+        titleEl.textContent = i18n[currentLang].admin_title;
+        subEl.textContent = currentLang === 'te' ? 'షెడ్యూల్స్ నిర్వహణ & నవీకరణ' : 'Manage schedules & notices';
+        if (iconEl) iconEl.setAttribute('data-lucide', 'calendar-plus');
+      } else {
+        titleEl.textContent = i18n[currentLang].admin_login_title;
+        subEl.textContent = i18n[currentLang].admin_login_subtitle;
+        if (iconEl) iconEl.setAttribute('data-lucide', 'shield-check');
+      }
+      if (window.lucide) lucide.createIcons();
+    }
+
+    function openAdminModal() {
+      const modal = document.getElementById('adminModal');
+      const authSec = document.getElementById('adminAuthSection');
+      const dashSec = document.getElementById('adminDashboardSection');
+
+      updateAdminModalHeader();
+
+      if (isAdminLoggedIn) {
+        authSec.classList.add('hidden');
+        dashSec.classList.remove('hidden');
+        resetScheduleForm();
+        renderBroadcastBanner();
+      } else {
+        authSec.classList.remove('hidden');
+        dashSec.classList.add('hidden');
+        document.getElementById('adminPinInput').value = '';
+      }
+
+      modal.classList.remove('hidden');
+      modal.classList.add('flex');
+      if (window.lucide) lucide.createIcons();
+    }
+
+    function closeAdminModal() {
+      const modal = document.getElementById('adminModal');
+      modal.classList.add('hidden');
+      modal.classList.remove('flex');
+    }
+
+    function handleAdminLogin(e) {
+      e.preventDefault();
+      const enteredPin = document.getElementById('adminPinInput').value.trim();
+      if (enteredPin === guruswamyPin || enteredPin === '108') {
+        isAdminLoggedIn = true;
+        window.isAdminLoggedIn = true;
+        updateAdminModalHeader();
+        document.getElementById('adminAuthSection').classList.add('hidden');
+        document.getElementById('adminDashboardSection').classList.remove('hidden');
+        resetScheduleForm();
+        renderBroadcastBanner();
+        renderSchedules();
+        showToast(i18n[currentLang].toast_login_success);
+      } else {
+        showToast(i18n[currentLang].toast_invalid_pin);
+      }
+    }
+
+    function handleAdminLogout() {
+      isAdminLoggedIn = false;
+      window.isAdminLoggedIn = false;
+      updateAdminModalHeader();
+      closeAdminModal();
+      renderSchedules();
+      showToast(currentLang === 'te' ? "లాగౌట్ పూర్తయింది" : "Logged out successfully");
+    }
+
+    /**
+     * Auto-populate default timings based on selected event type:
+     * - భిక్ష (Biksha) -> "12:30 PM"
+     * - అల్పాహారం (Alpharam) -> "08:00 PM"
+     * Guruswamy can manually override the custom time selects freely.
+     */
+    function handleTypeChange(e) {
+      const val = e && e.target ? e.target.value : e;
+      if (val === 'biksha') {
+        setTimeInputs('12:30 PM');
+      } else if (val === 'alpharam') {
+        setTimeInputs('08:00 PM');
+      }
+    }
+
+    function resetScheduleForm() {
+      document.getElementById('formScheduleId').value = '';
+      const bikshaRadio = document.querySelector('input[name="formType"][value="biksha"]') || document.querySelector('input[name="eventType"][value="biksha"]');
+      if (bikshaRadio) bikshaRadio.checked = true;
+      document.getElementById('formDate').value = getOffsetDate(1);
+      setTimeInputs('12:30 PM');
+      document.getElementById('formHost').value = '';
+      document.getElementById('formPhone').value = '';
+      document.getElementById('formAddress').value = '';
+      document.getElementById('formMapsUrl').value = '';
+      document.getElementById('formSubmitBtnText').textContent = i18n[currentLang].btn_save_schedule;
+    }
+
+    function saveScheduleForm(e) {
+      e.preventDefault();
+      syncCustomTimeInputs();
+      const id = document.getElementById('formScheduleId').value;
+      const typeRadio = document.querySelector('input[name="formType"]:checked') || document.querySelector('input[name="eventType"]:checked') || document.querySelector('input[name="formType"]');
+      const type = typeRadio ? typeRadio.value : 'biksha';
+      const date = document.getElementById('formDate').value;
+      const time = formatTo12Hour(document.getElementById('formTime').value);
+      const host = document.getElementById('formHost').value.trim();
+      const phone = document.getElementById('formPhone').value.trim();
+      const address = document.getElementById('formAddress').value.trim();
+      const mapsUrl = document.getElementById('formMapsUrl').value.trim();
+
+      let targetId = id;
+      let itemToSave = null;
+      if (id) {
+        // Edit existing
+        const idx = schedules.findIndex(s => s.id === id);
+        if (idx !== -1) {
+          schedules[idx] = {
+            ...schedules[idx],
+            type, date, time, host, phone, address, mapsUrl
+          };
+          if (currentLang === 'te') {
+            schedules[idx].host_te = host;
+            schedules[idx].address_te = address;
+            schedules[idx].host_en = '';
+            schedules[idx].address_en = '';
+          } else {
+            schedules[idx].host_en = host;
+            schedules[idx].address_en = address;
+            schedules[idx].host_te = '';
+            schedules[idx].address_te = '';
+          }
+          itemToSave = schedules[idx];
+        }
+      } else {
+        // Add new
+        targetId = 'sch_' + Date.now();
+        itemToSave = {
+          id: targetId,
+          type,
+          date,
+          time,
+          host,
+          host_en: currentLang === 'en' ? host : '',
+          host_te: currentLang === 'te' ? host : '',
+          phone,
+          address,
+          address_en: currentLang === 'en' ? address : '',
+          address_te: currentLang === 'te' ? address : '',
+          mapsUrl
+        };
+        schedules.push(itemToSave);
+      }
+
+      if (eventsRef && itemToSave) {
+        eventsRef.child(targetId).set(itemToSave).catch(e => console.warn("Firebase RTDB set notice:", e));
+      }
+      saveEventsToStorage(schedules);
+      resetScheduleForm();
+      closeAdminModal();
+      renderCalendar();
+      renderSchedules();
+      showToast(i18n[currentLang].toast_saved);
+
+      // Eagerly pre-translate in background for the other language (if address provided)
+      const oppositeLang = currentLang === 'te' ? 'en' : 'te';
+      preTranslateSchedule(targetId, host, address, oppositeLang);
+    }
+
+    function editSchedule(id) {
+      const item = schedules.find(s => s.id === id);
+      if (!item) return;
+
+      openAdminModal();
+      document.getElementById('formScheduleId').value = item.id;
+      const radio = document.querySelector(`input[name="formType"][value="${item.type}"]`);
+      if (radio) radio.checked = true;
+      document.getElementById('formDate').value = item.date;
+      setTimeInputs(item.time);
+      document.getElementById('formHost').value = item.host;
+      document.getElementById('formPhone').value = item.phone;
+      document.getElementById('formAddress').value = item.address || '';
+      document.getElementById('formMapsUrl').value = item.mapsUrl || '';
+      document.getElementById('formSubmitBtnText').textContent = currentLang === 'te' ? "సవరించండి (Update)" : "Update Schedule";
+    }
+
+    function deleteSchedule(id) {
+      if (confirm(currentLang === 'te' ? "ఈ షెడ్యూల్‌ను తొలగించాలనుకుంటున్నారా?" : "Are you sure you want to delete this schedule?")) {
+        schedules = schedules.filter(s => s.id !== id);
+        if (eventsRef) {
+          eventsRef.child(id).remove().catch(e => console.warn("Firebase RTDB remove notice:", e));
+        }
+        saveEventsToStorage(schedules);
+        renderCalendar();
+        renderSchedules();
+        showToast(i18n[currentLang].toast_deleted);
+      }
+    }
+
+    function promptChangePIN() {
+      const newPin = prompt(currentLang === 'te' ? "కొత్త సెక్యూరిటీ పిన్ నమోదు చేయండి (4-6 అంకెలు):" : "Enter new 4-6 digit security PIN:");
+      if (newPin && newPin.trim().length >= 3) {
+        guruswamyPin = newPin.trim();
+        try {
+          localStorage.setItem('ayyappa_admin_pin', guruswamyPin);
+        } catch (e) { }
+        if (configRef) {
+          configRef.child('adminPin').set(guruswamyPin).catch(e => console.warn("Firebase RTDB PIN notice:", e));
+        }
+        showToast(i18n[currentLang].toast_pin_changed);
+      }
+    }
+
+    /**
+     * Simple Toast
+     */
+    let toastTimer = null;
+    function showToast(msg, icon = '✨') {
+      const toast = document.getElementById('toast');
+      document.getElementById('toastMsg').textContent = msg;
+      document.getElementById('toastIcon').textContent = icon;
+
+      toast.classList.remove('translate-y-20', 'opacity-0');
+      toast.classList.add('translate-y-0', 'opacity-100');
+
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => {
+        toast.classList.remove('translate-y-0', 'opacity-100');
+        toast.classList.add('translate-y-20', 'opacity-0');
+      }, 3000);
+    }
+
+    /**
+     * =========================================================================
+     * INITIALIZATION
+     * =========================================================================
+     */
+    document.addEventListener('DOMContentLoaded', () => {
+      // 1. Purge past events before initial render
+      cleanupPastEvents();
+
+      // 2. Schedule live midnight auto-purge
+      scheduleMidnightCleanup();
+
+      // 3. Initialize with active language
+      switchLanguage(currentLang);
+
+      // 4. Connect Firebase Realtime Database Sync
+      initFirebaseSync();
+
+      // Auto-populate default timings on event type selection change
+      const typeInputs = document.querySelectorAll('input[name="formType"], input[name="eventType"]');
+      typeInputs.forEach(input => {
+        input.addEventListener('change', (e) => {
+          if (e.target.value === 'biksha') {
+            setTimeInputs('12:30 PM');
+          } else if (e.target.value === 'alpharam') {
+            setTimeInputs('08:00 PM');
+          }
+        });
+      });
+
+      // Check and purge past events when tab/app regains visibility (e.g. next morning)
+      document.addEventListener('visibilitychange', () => {
+        if (!document.hidden) {
+          const prevCount = schedules.length;
+          cleanupPastEvents();
+          if (schedules.length !== prevCount) {
+            renderCalendar();
+            renderSchedules();
+          }
+        }
+      });
+
+      // Close modal on outside backdrop click
+      const modal = document.getElementById('adminModal');
+      modal.addEventListener('click', (e) => {
+        if (e.target === modal) {
+          closeAdminModal();
+        }
+      });
+    });
+  </script>
+</body>
+
+</html>
