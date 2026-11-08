@@ -1,5 +1,8 @@
 # 🕉️ అయ్యప్ప భిక్ష క్యాలెండర్ (Ayyappa Biksha Calendar)
 
+![Release](https://img.shields.io/badge/Release-v1.0.0-orange?style=flat-square)
+![Platform](https://img.shields.io/badge/Platform-Vercel%20%7C%20GitHub-blue?style=flat-square)
+
 A modern, mobile-first single-page web application designed for Ayyappa Swamy devotees and Guruswamys during the sacred Mandala Deeksha season to easily organize, view, and share **భిక్ష (Biksha / Afternoon Lunch)** and **అల్పాహారం (Alpharam / Night Tiffin)** schedules.
 
 ---
